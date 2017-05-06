@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Python Machine Learning Programming Tutorials</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+
+<body class = "body">
+
+<nav class="navbar navbar-default" role="navigation">
+ 
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+    <ul class="nav navbar-nav">
+	  
+	<div class="navbar-header">
+      <a class="navbar-brand" href="/">
+	  <img alt="Brand" class="img-rounded" style="max-width:180px;margin-top: -18px;margin-left: -35px;" src="{{ url_for('static', filename='images/mainlogo.png') }}">
+	  </a>
+    </div>
+	    <li><a  href="/">HOME</a>
+        <li><a  href="/graph">GRAPH</a></li>		
+    </ul>
+	
+	
+
+  
+</nav>
+
+	<body>
+		<h3>{{ title }}</h3>
+		{% for p in paragraph %}
+		<p>{{ p }}</p>
+		{% endfor %}
+		
+		{% block body %}
+		{% endblock %}
+	</body>
+	
+</body>
+<body>
+<nav class="navbar navbar-default" role="navigation">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <p> hello graph page </p>
+	</div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+    <ul class="nav navbar-nav">
+<!-- Footer -->
+<footer class="text-center">
+  <a class="up-arrow" href="/" data-toggle="tooltip" title="TO TOP">
+    <span class="glyphicon glyphicon-chevron-up"></span>
+  </a>
+  <p><a href="https://www.w3schools.com" data-toggle="tooltip" title="Visit w3schools">Bootstrap Theme developed by W3schools <br>Edited BY : Data Crushers KMV</a></p> 
+</footer>
+
+<script>
+$(document).ready(function(){
+  // Initialize Tooltip
+  $('[data-toggle="tooltip"]').tooltip(); 
+  
+  // Add smooth scrolling to all links in navbar + footer link
+  $(".navbar a, footer a[href='#myPage']").on('click', function(event) {
+
+    // Make sure this.hash has a value before overriding default behavior
+    if (this.hash !== "") {
+
+      // Prevent default anchor click behavior
+      event.preventDefault();
+
+      // Store hash
+      var hash = this.hash;
+
+      // Using jQuery's animate() method to add smooth page scroll
+      // The optional number (900) specifies the number of milliseconds it takes to scroll to the specified area
+      $('html, body').animate({
+        scrollTop: $(hash).offset().top
+      }, 900, function(){
+   
+        // Add hash (#) to URL when done scrolling (default click behavior)
+        window.location.hash = hash;
+      });
+    } // End if
+  });
+})
+</script>
+
+</body>
+</html>
+
+
+ </body>   	  
+
+
+
+<script type = "text/javascript" src = "/static/bootstrap.min.js"></script>
+
+
+</html>

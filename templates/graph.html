@@ -1,0 +1,15 @@
+{% extends "index.html" %}
+{% block body %}
+
+	<body>
+	<div class="col-sm-6">
+	 <div class="thumbnail">
+        <img src="{{ url_for('static', filename='images/Cross validation vs KNN.png') }}" width="220" height="220">
+		  <p><strong>CROSS VALIDATION KNN</strong></p>
+          <p>Best Parameter 'N_neighbors': 28</p>
+		</div>
+	</div>
+	</body>
+	
+	
+{% endblock %}
