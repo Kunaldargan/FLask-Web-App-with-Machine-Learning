@@ -1,12 +1,51 @@
-# Inflation Lab
+<p align="center">
+  <img src="static/images/ml.png" alt="Machine learning concept artwork" width="760">
+</p>
 
-Inflation Lab is a small Flask application that exposes a saved scikit-learn regression model through a responsive web interface. Enter ten economic indicators, run the preserved K-nearest-neighbors model, and compare its saved predictions with the test values on the evaluation page.
+<h1 align="center">Inflation Lab</h1>
 
-The project began as a 2017 classroom experiment. This pass gives it a conventional Flask entry point, a clear application boundary, shared templates, input validation, a compatibility loader for the old model artifact, and documentation that reflects what actually runs.
+<p align="center">
+  A small, visual machine-learning laboratory: a Flask prediction app, saved regression experiments, image-processing utilities, and an optional temporal CNN.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white" alt="Python 3.9 or newer">
+  <img src="https://img.shields.io/badge/Flask-2.2%2B-000000?logo=flask&logoColor=white" alt="Flask">
+  <img src="https://img.shields.io/badge/scikit--learn-1.x-F7931E?logo=scikit-learn&logoColor=white" alt="scikit-learn">
+  <img src="https://img.shields.io/badge/experiments-CV%20%7C%20CNN-176B87" alt="Computer vision and CNN experiments">
+</p>
+
+## What is inside
+
+Inflation Lab started as a 2017 classroom project around inflation-rate regression. It now has a cleaner application boundary and a broader experiment surface:
+
+| Area | What it does |
+| --- | --- |
+| **Web app** | Collects ten economic indicators and runs the preserved K-nearest-neighbors estimator. |
+| **Model evaluation** | Shows the saved predicted-vs-actual series and mean squared error. |
+| **Computer vision** | Generates grayscale, threshold, Sobel-edge, histogram, and edge-mask views from an image. |
+| **Temporal CNN** | Trains an optional 1D convolutional network over chronological economic windows. |
+
+## Visual tour
+
+The repository includes the original model plots plus a reproducible computer-vision inspection sheet generated from the checked-in AI illustration.
+
+<p align="center">
+  <img src="docs/images/computer-vision-report.png" alt="Computer vision report with original, grayscale, threshold, Sobel, histogram, and edge-mask panels" width="820">
+</p>
+
+<p align="center"><em>Computer-vision preprocessing experiment: original → grayscale → threshold → Sobel edges.</em></p>
+
+<p align="center">
+  <img src="static/images/knnPlot1.png" alt="KNN prediction and test-series plot" width="390">
+  <img src="static/images/Cross%20validation%20vs%20KNN.png" alt="KNN cross-validation plot" width="390">
+</p>
+
+<p align="center"><em>Historical KNN comparison and cross-validation artifacts.</em></p>
 
 ## Quick start
 
-The application expects Python 3.9+ and a local checkout of the serialized model files.
+The web application expects Python 3.9+ and the serialized model files in the project root.
 
 ```bash
 python -m venv .venv
@@ -15,38 +54,97 @@ pip install -r requirements.txt
 python app.py
 ```
 
-Open <http://127.0.0.1:5000>. Set `FLASK_DEBUG=1` only during local development if you want Flask’s reloader and debugger.
-For a deployed instance, set a strong random `SECRET_KEY` in the environment.
+Open <http://127.0.0.1:5000>. Set `FLASK_DEBUG=1` only during local development. For deployment, set a strong random `SECRET_KEY` in the environment.
 
-The production-style Flask command is also available with Flask 2.2+:
+With Flask 2.2+, the equivalent command is:
 
 ```bash
 flask --app app:app run
 ```
 
+## Experiments
+
+### Computer vision
+
+The dependency-light image experiment is in [`experiments/computer_vision.py`](experiments/computer_vision.py). It uses Pillow and NumPy to create a six-panel inspection sheet:
+
+1. original RGB image;
+2. luminance/grayscale conversion;
+3. configurable binary threshold;
+4. normalized Sobel gradient magnitude;
+5. RGB channel histograms; and
+6. a high-contrast edge mask.
+
+Run it from the project root:
+
+```bash
+python -m experiments.computer_vision \
+  --input static/images/614716.jpg \
+  --output docs/images/computer-vision-report.png
+```
+
+Try a different segmentation threshold:
+
+```bash
+python -m experiments.computer_vision \
+  --input static/images/614716.jpg \
+  --output /tmp/vision-threshold-180.png \
+  --threshold 180
+```
+
+### 1D CNN over economic time-series data
+
+[`experiments/time_series_cnn.py`](experiments/time_series_cnn.py) treats a sequence of consecutive economic observations as a one-dimensional signal. Causal `Conv1D` layers learn local temporal patterns and a regression head predicts the next target value. The train/validation split is chronological and training uses `shuffle=False`.
+
+TensorFlow is optional and is not imported by the Flask server:
+
+```bash
+pip install -r requirements-cnn.txt
+python -m experiments.time_series_cnn \
+  --data /path/to/pro.csv \
+  --time-column Year \
+  --target INFLATION \
+  --window-size 5 \
+  --output-dir artifacts/time-series-cnn
+```
+
+The run writes:
+
+- `time_series_cnn.keras` — trained temporal CNN;
+- `predictions.csv` — chronological validation predictions; and
+- `metrics.json` — MAE, RMSE, window size, and sample counts.
+
+The original `pro.csv` is not included in this checkout, so the CNN command needs a local copy of that dataset or an equivalent numeric CSV.
+
+More detail is available in [`experiments/README.md`](experiments/README.md).
+
 ## Application structure
 
 ```text
-app.py                     Canonical development entry point
+app.py                         Canonical Flask entry point
 inflation_app/
-  __init__.py               App factory and routes
-  model_service.py          Lazy model loading and prediction contract
-templates/                  Shared responsive UI
-static/css/app.css          Application styles
-static/js/app.js            Small progressive-enhancement script
-*.pkl, pred, ytest          Preserved model and evaluation artifacts
-legacy/                     Original training scripts and unused UI assets
+  __init__.py                   App factory, routes, and evaluation page
+  model_service.py              Legacy-model compatibility and prediction
+experiments/
+  computer_vision.py            Pillow/NumPy image-processing experiment
+  time_series_cnn.py            Optional TensorFlow temporal CNN
+templates/                      Shared responsive UI
+static/css/app.css              Application styles
+static/js/app.js                Small progressive-enhancement script
+docs/images/                    README experiment visuals
+*.pkl, pred, ytest              Preserved model/evaluation artifacts
+legacy/                         Original training scripts and unused UI assets
 ```
 
-`_init_.py` remains as a compatibility shim for anyone using the original filename. New code should import `app` or `create_app` from `app.py`.
+`_init_.py` remains as a compatibility shim for the original filename. New code should import `app` or `create_app` from `app.py`.
 
-## Routes
+## Web routes
 
 | Route | Method | Purpose |
 | --- | --- | --- |
 | `/` | GET | Prediction form and model overview |
 | `/predict` | POST | Validates inputs and renders a prediction |
-| `/result` | GET/POST | Backward-compatible alias for prediction |
+| `/result` | GET/POST | Backward-compatible prediction alias |
 | `/graph` | GET | Saved predicted-vs-actual evaluation |
 | `/about` | GET | Project and artifact notes |
 | `/contact` | GET/POST | Demo feedback form |
@@ -67,20 +165,21 @@ The live model receives exactly these ten values, in this order:
 9. CO₂ emissions (`co2`)
 10. Public-sector capital (`cap`)
 
-The original training script stored a normalized target and later converted the model output with `prediction * 36.23 - 7.63`. The application preserves that transformation for compatibility with the shipped artifact. The `year`/month field is displayed for context and is not passed to the model because the serialized estimator was trained with ten features.
+The original training script normalized the target and later applied `prediction * 36.23 - 7.63`. The web app preserves that transformation for compatibility. The optional month field is shown for context but is not passed to the estimator because the saved model was trained with ten features.
 
-## Model artifacts
+## Model and data notes
 
-The model files were serialized with an older scikit-learn release. `inflation_app/model_service.py` remaps the old module paths and rebuilds the saved KNN search tree from the training arrays when the artifact is loaded. This keeps the demo usable on current supported environments, but it does not make the historical model production-grade.
+The serialized models were created with an older scikit-learn release. [`inflation_app/model_service.py`](inflation_app/model_service.py) remaps old module paths and rebuilds the saved KNN search tree from its training arrays when possible.
 
-The original scripts refer to a machine-specific `pro.csv` path and use removed scikit-learn APIs. They are preserved under `legacy/training/` for historical reference rather than imported by the web app. To create a trustworthy production model, supply a versioned dataset, persist the preprocessing pipeline with the estimator, retrain with a supported scikit-learn version, and add model-quality tests.
+The original training scripts refer to a machine-specific Windows path and removed scikit-learn APIs. They are archived under `legacy/training/` rather than imported by the web app. For production use, provide a versioned dataset, persist preprocessing with the estimator, retrain on a supported version, and add model-quality tests.
 
 ## Verification
 
-Run the lightweight checks from the project root:
-
 ```bash
-python -m compileall -q app.py _init_.py inflation_app
+python -m compileall -q app.py _init_.py inflation_app experiments
+python -m experiments.computer_vision \
+  --input static/images/614716.jpg \
+  --output /tmp/computer-vision-report.png
 python - <<'PY'
 from app import app
 
@@ -93,7 +192,8 @@ PY
 
 ## Limitations
 
-- The application is an educational demo, not an investment or policy tool.
-- The serialized models and evaluation arrays are committed binary artifacts; inspect their provenance before using them for decisions.
+- This is an educational laboratory, not an investment, policy, or medical tool.
+- Serialized pickle files should only be loaded from trusted sources.
+- The committed model and evaluation arrays are historical artifacts; inspect their provenance before using them for decisions.
 - The contact form displays a confirmation but does not send email or persist messages.
-- The evaluation chart loads Chart.js from a CDN; the data table remains available if JavaScript is disabled.
+- The evaluation chart loads Chart.js from a CDN; its data table remains available without JavaScript.
