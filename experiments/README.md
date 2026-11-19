@@ -17,7 +17,7 @@ Run it from the project root:
 
 ```bash
 python -m experiments.computer_vision \
-  --input static/images/CHESS2.PNG \
+  --input static/images/cv-fruit-public-domain.jpg \
   --output docs/images/computer-vision-report.png
 ```
 
@@ -25,12 +25,24 @@ Try another threshold to see how segmentation changes:
 
 ```bash
 python -m experiments.computer_vision \
-  --input static/images/CHESS2.PNG \
-  --output /tmp/chess2-threshold-180.png \
+  --input static/images/cv-fruit-public-domain.jpg \
+  --output /tmp/fruit-threshold-180.png \
   --threshold 180
 ```
 
 The implementation uses Pillow and NumPy only. It is intended for learning and visual inspection, not as a replacement for a production image-processing pipeline.
+
+## Filter the inflation graph and predict
+
+The original KNN comparison image, `static/images/knnPlot1.png`, contains an orange inflation trace. `graph_image_predictor.py` applies a color-distance filter to isolate that line, interpolates gaps caused by anti-aliasing, smooths the pixel trace, converts it through the chart calibration, and extrapolates one next value from the final five samples.
+
+```bash
+python -m experiments.graph_image_predictor \
+  --input static/images/knnPlot1.png \
+  --output docs/images/inflation-graph-filter-prediction.png
+```
+
+The output report shows the original graph, filtered line mask, extracted/filtered trace, and forecast summary. The default run produces an estimate of approximately `0.3141` for this static image. Because the input is a screenshot, the result is sensitive to axis bounds, line color, resolution, and crop; treat it as a graph-digitization experiment, not a production forecast.
 
 ## 1D CNN over time-series data
 

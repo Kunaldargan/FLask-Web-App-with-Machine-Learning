@@ -1,8 +1,4 @@
-<p align="center">
-  <img src="static/images/ml.png" alt="Machine learning concept artwork" width="760">
-</p>
-
-<h1 align="center">Inflation Lab</h1>
+<h1 align="center">Inflation Prediction Project</h1>
 
 <p align="center">
   A small, visual machine-learning laboratory: a Flask prediction app, saved regression experiments, image-processing utilities, and an optional temporal CNN.
@@ -24,11 +20,12 @@ Inflation Lab started as a 2017 classroom project around inflation-rate regressi
 | **Web app** | Collects ten economic indicators and runs the preserved K-nearest-neighbors estimator. |
 | **Model evaluation** | Shows the saved predicted-vs-actual series and mean squared error. |
 | **Computer vision** | Generates grayscale, threshold, Sobel-edge, histogram, and edge-mask views from an image. |
+| **Graph-image prediction** | Filters the inflation graph, digitizes the orange curve, and extrapolates its next plotted value. |
 | **Temporal CNN** | Trains an optional 1D convolutional network over chronological economic windows. |
 
 ## Visual tour
 
-The repository includes the original model plots plus a reproducible computer-vision inspection sheet generated from the checked-in AI illustration.
+The repository includes the original model plots plus a reproducible computer-vision inspection sheet generated from a real public-domain photograph.
 
 <p align="center">
   <img src="docs/images/computer-vision-report.png" alt="Computer vision report with original, grayscale, threshold, Sobel, histogram, and edge-mask panels" width="820">
@@ -42,6 +39,12 @@ The repository includes the original model plots plus a reproducible computer-vi
 </p>
 
 <p align="center"><em>Historical KNN comparison and cross-validation artifacts.</em></p>
+
+<p align="center">
+  <img src="docs/images/inflation-graph-filter-prediction.png" alt="Inflation graph filtered and used to estimate the next plotted value" width="820">
+</p>
+
+<p align="center"><em>Graph-image experiment: filter the orange inflation curve, smooth its pixels, and estimate the next plotted value.</em></p>
 
 ## Quick start
 
@@ -79,7 +82,7 @@ Run it from the project root:
 
 ```bash
 python -m experiments.computer_vision \
-  --input static/images/614716.jpg \
+  --input static/images/cv-fruit-public-domain.jpg \
   --output docs/images/computer-vision-report.png
 ```
 
@@ -87,7 +90,7 @@ Try a different segmentation threshold:
 
 ```bash
 python -m experiments.computer_vision \
-  --input static/images/614716.jpg \
+  --input static/images/cv-fruit-public-domain.jpg \
   --output /tmp/vision-threshold-180.png \
   --threshold 180
 ```
@@ -118,6 +121,22 @@ The original `pro.csv` is not included in this checkout, so the CNN command need
 
 More detail is available in [`experiments/README.md`](experiments/README.md).
 
+### Filter the inflation graph and predict
+
+[`experiments/graph_image_predictor.py`](experiments/graph_image_predictor.py) uses the original KNN graph image as input. It applies an RGB color filter to isolate the orange inflation curve, interpolates missing pixels, smooths the extracted trace, maps pixels to the chart’s y-axis, and fits a one-step linear extrapolation over the last five plotted samples:
+
+```bash
+python -m experiments.graph_image_predictor \
+  --input static/images/knnPlot1.png \
+  --output docs/images/inflation-graph-filter-prediction.png
+```
+
+The checked-in report estimates the next plotted value as approximately `0.3141` for the default five-point window. This is a transparent graph-digitization demonstration: the result depends on the image’s axis calibration, line color, resolution, and crop. For reliable forecasting, use the original numeric time series instead of a screenshot.
+
+### Image source
+
+The source photograph is [`cv-fruit-public-domain.jpg`](static/images/cv-fruit-public-domain.jpg), downloaded from [Fruit3.jpg on Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fruit3.jpg). It was photographed by Neelix and released to the public domain. See [`docs/image-sources.md`](docs/image-sources.md) for the source record.
+
 ## Application structure
 
 ```text
@@ -127,6 +146,7 @@ inflation_app/
   model_service.py              Legacy-model compatibility and prediction
 experiments/
   computer_vision.py            Pillow/NumPy image-processing experiment
+  graph_image_predictor.py      Filtered graph digitization and extrapolation
   time_series_cnn.py            Optional TensorFlow temporal CNN
 templates/                      Shared responsive UI
 static/css/app.css              Application styles
@@ -178,7 +198,7 @@ The original training scripts refer to a machine-specific Windows path and remov
 ```bash
 python -m compileall -q app.py _init_.py inflation_app experiments
 python -m experiments.computer_vision \
-  --input static/images/614716.jpg \
+  --input static/images/cv-fruit-public-domain.jpg \
   --output /tmp/computer-vision-report.png
 python - <<'PY'
 from app import app
