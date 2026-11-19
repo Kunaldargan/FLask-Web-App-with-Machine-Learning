@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}About the project{% endblock %}
+
+{% block content %}
+<section class="section shell narrow-page">
+  <p class="eyebrow">About the project</p>
+  <h1>A clearer home for a small machine-learning experiment.</h1>
+  <p class="lede">Inflation Lab is a Flask interface around a collection of regression models trained on economic indicators. It started as a classroom project and now has a simpler application boundary, safer input handling, and documentation that matches the code.</p>
+  <div class="prose-grid">
+    <article><h2>What changed</h2><p>The web layer now has a conventional <code>app.py</code> entry point, an application package, a shared template, named routes, and a dedicated model service. Legacy serialized estimators are loaded lazily so the server can start without doing unnecessary work.</p></article>
+    <article><h2>What to remember</h2><p>The artifacts were trained with an older scikit-learn release. The compatibility loader rebuilds the saved KNN index when possible, but the result is still a historical demonstration, not a production forecasting system.</p></article>
+  </div>
+</section>
+{% endblock %}

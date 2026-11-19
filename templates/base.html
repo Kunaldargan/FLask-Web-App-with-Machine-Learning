@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A small Flask application for exploring inflation predictions with machine learning.">
+    <title>{% block title %}Inflation Lab{% endblock %} · Inflation Lab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav shell" aria-label="Primary navigation">
+        <a class="brand" href="{{ url_for('home') }}">
+          <span class="brand-mark">IL</span>
+          <span>Inflation Lab</span>
+        </a>
+        <div class="nav-links">
+          <a href="{{ url_for('home') }}">Predict</a>
+          <a href="{{ url_for('graph') }}">Evaluation</a>
+          <a href="{{ url_for('about') }}">About</a>
+          <a class="nav-cta" href="{{ url_for('contact') }}">Contact</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="shell flash-stack" aria-live="polite">
+            {% for category, message in messages %}
+              <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+      <div class="shell footer-inner">
+        <span>Inflation Lab · Flask + scikit-learn</span>
+        <span>Educational demo — predictions are not financial advice.</span>
+      </div>
+    </footer>
+    <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

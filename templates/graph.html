@@ -1,15 +1,57 @@
-{% extends "index.html" %}
-{% block body %}
+{% extends "base.html" %}
 
-	<body>
-	<div class="col-sm-6">
-	 <div class="thumbnail">
-        <img src="{{ url_for('static', filename='images/Cross validation vs KNN.png') }}" width="220" height="220">
-		  <p><strong>CROSS VALIDATION KNN</strong></p>
-          <p>Best Parameter 'N_neighbors': 28</p>
-		</div>
-	</div>
-	</body>
-	
-	
+{% block title %}Evaluation{% endblock %}
+
+{% block content %}
+<section class="section shell">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Saved evaluation</p>
+      <h1>Predicted vs actual</h1>
+    </div>
+    <p>The chart uses the prediction and test arrays shipped with this project. Samples are shown in saved-array order.</p>
+  </div>
+
+  {% if points %}
+    <div class="metric-row">
+      <div class="metric"><span>Samples</span><strong>{{ points|length }}</strong></div>
+      <div class="metric"><span>Mean squared error</span><strong>{{ '%.5f'|format(mse) }}</strong></div>
+      <div class="metric"><span>Model</span><strong>KNN</strong></div>
+    </div>
+    <div class="chart-card"><canvas id="evaluation-chart" aria-label="Line chart comparing predictions and actual values" role="img"></canvas></div>
+    <div class="table-wrap">
+      <table>
+        <caption>Evaluation samples</caption>
+        <thead><tr><th scope="col">Sample</th><th scope="col">Predicted</th><th scope="col">Actual</th></tr></thead>
+        <tbody>
+          {% for point in points %}
+            <tr><td>{{ point.sample }}</td><td>{{ point.predicted }}</td><td>{{ point.actual }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-state"><h2>Evaluation data unavailable</h2><p>The saved prediction arrays could not be read from this checkout.</p></div>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+  {% if points %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script>
+      const evaluationPoints = {{ points | tojson }};
+      new Chart(document.getElementById('evaluation-chart'), {
+        type: 'line',
+        data: {
+          labels: evaluationPoints.map(point => `#${point.sample}`),
+          datasets: [
+            { label: 'Predicted', data: evaluationPoints.map(point => point.predicted), borderColor: '#e36b4f', backgroundColor: 'rgba(227, 107, 79, .12)', tension: .28 },
+            { label: 'Actual', data: evaluationPoints.map(point => point.actual), borderColor: '#176b87', backgroundColor: 'rgba(23, 107, 135, .12)', tension: .28 }
+          ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, scales: { y: { title: { display: true, text: 'Scaled value' } } } }
+      });
+    </script>
+  {% endif %}
 {% endblock %}

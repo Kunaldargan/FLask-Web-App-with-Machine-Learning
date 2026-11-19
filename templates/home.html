@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Predict inflation{% endblock %}
+
+{% block content %}
+<section class="hero shell">
+  <div class="hero-copy">
+    <p class="eyebrow">Machine learning playground</p>
+    <h1>Explore the indicators behind an inflation estimate.</h1>
+    <p class="lede">Enter ten economic indicators and run the preserved KNN regression model from the original project. The interface is new; the model contract stays explicit.</p>
+    <div class="hero-actions">
+      <a class="button button-primary" href="#predict">Run a prediction <span aria-hidden="true">↓</span></a>
+      <a class="text-link" href="{{ url_for('graph') }}">View saved evaluation →</a>
+    </div>
+  </div>
+  <div class="hero-card" aria-label="Project summary">
+    <div class="orb orb-large"></div>
+    <div class="orb orb-small"></div>
+    <p class="eyebrow">Model snapshot</p>
+    <div class="hero-stat"><strong>10</strong><span>input indicators</span></div>
+    <div class="hero-stat"><strong>KNN</strong><span>live estimator</span></div>
+    <div class="hero-stat"><strong>2017</strong><span>training-era artifact</span></div>
+  </div>
+</section>
+
+<section class="section shell" id="predict">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">01 · Make an estimate</p>
+      <h2>Prediction inputs</h2>
+    </div>
+    <p>Use the same feature order used during training. All values are numeric and can be decimals.</p>
+  </div>
+
+  <form class="prediction-form" action="{{ url_for('predict') }}" method="post">
+    <div class="form-grid">
+      <div class="field field-wide">
+        <label for="year">Reference month <span class="muted">optional</span></label>
+        <input id="year" name="year" type="month">
+      </div>
+      {% for field, label in feature_fields %}
+        <div class="field">
+          <label for="{{ field }}">{{ label }}</label>
+          <input id="{{ field }}" name="{{ field }}" type="number" step="any" inputmode="decimal" required>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="form-footer">
+      <p class="form-note">The result is an estimate based on a saved historical model. It does not forecast future market conditions.</p>
+      <button class="button button-primary" type="submit">Calculate estimate <span aria-hidden="true">→</span></button>
+    </div>
+  </form>
+</section>
+
+<section class="section section-muted">
+  <div class="shell">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">02 · What is included</p>
+        <h2>Four model perspectives</h2>
+      </div>
+      <p>The project includes several serialized estimators. KNN powers the form; the others remain available as comparison artifacts.</p>
+    </div>
+    <div class="model-grid">
+      {% for model in models %}
+        <article class="model-card">
+          <div class="model-icon">{{ model.short_name }}</div>
+          <div>
+            <div class="card-meta"><span>{{ model.status }}</span><span>0{{ loop.index }}</span></div>
+            <h3>{{ model.name }}</h3>
+            <p>{{ model.description }}</p>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section shell workflow">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">03 · Follow the flow</p>
+      <h2>From indicator to insight</h2>
+    </div>
+  </div>
+  <div class="steps">
+    <div class="step"><span>1</span><h3>Describe</h3><p>Provide the economic indicators for a reference period.</p></div>
+    <div class="step"><span>2</span><h3>Estimate</h3><p>The saved KNN model compares the input with its training examples.</p></div>
+    <div class="step"><span>3</span><h3>Inspect</h3><p>Review the estimate and compare historical predictions on the evaluation page.</p></div>
+  </div>
+</section>
+{% endblock %}

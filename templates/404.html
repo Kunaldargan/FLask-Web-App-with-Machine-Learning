@@ -1,8 +1,12 @@
-{% extends "header.html" %}
+{% extends "base.html" %}
 
-{% block body %}
+{% block title %}Page not found{% endblock %}
 
-<p>Woops, that page doesn't exist! (404)</p>
-
+{% block content %}
+<section class="section shell narrow-page empty-state">
+  <p class="eyebrow">404</p>
+  <h1>This page wandered off.</h1>
+  <p>That route is not part of the current application.</p>
+  <a class="button button-primary" href="{{ url_for('home') }}">Back to the home page</a>
+</section>
 {% endblock %}
-		
